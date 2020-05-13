@@ -1,15 +1,43 @@
 import React from 'react';
-import Crypto from './components/crypto';
 import './App.css';
+import MainPage from './components/MainPage'
+import Login from './components/Login';
 
-function App() {
+class App extends React.Component {
+  state = {
+    showPage: false,
+  }
 
-  return (
-    <div className="App">
-      <Crypto name="Bitcoin" symbol="BTC" />
-    </div>
-  )
+  componentWillMount() {
+    if (localStorage.getItem('tradetoken')) {
+      this.setState({showPage: true});
+    }else {
+      this.setState({showPage: false});
+    }
+  }
 
-};
+  showMainPage = () => {
+    this.setState({showPage: true})
+  };
+
+  hideMainPage = () => {
+    localStorage.removeItem('tradetoken')
+    this.setState({showPage: false})
+  }
+
+  render() {
+    return (
+      <div className="App">
+
+
+      {this.state.showPage ? <MainPage hideMainPage={this.hideMainPage} /> : <Login showMainPage={this.showMainPage} />}
+
+
+      </div>
+    )
+  }
+
+
+}
 
 export default App;

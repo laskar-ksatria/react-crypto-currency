@@ -1,61 +1,54 @@
 import React from 'react';
-import './style.css';
-import fetch from 'isomorphic-fetch';
+import './Crypto.css';
 
 class CryptoCard extends React.Component {
 
-    constructor(props) {
+    constructor(props) { 
         super(props)
         this.state = {
             name: props.name,
             symbol: props.symbol,
-            price:null,
-            lastPrice: null,
+            price: null,
+            lastPrice: null
         }
+        this.pollPrice = this.pollPrice.bind(this)
     };
 
     componentDidMount() {
-       this.pollPrice()
-       setInterval(this.pollPrice, 5000)
+        this.pollPrice();
+        setInterval(this.pollPrice, 10000)
     };
 
-    pollPrice = () => {
-        const { symbol } = this.state;
+    pollPrice() {
+        console.log('Polling price')
+        const { symbol } = this.state
         fetch(`https://min-api.cryptocompare.com/data/price?fsym=${symbol}&tsyms=${symbol},USD`)
-            .then(res => res.json())
+            .then(resp => resp.json())
             .then(json => {
-                this.setState((prevState) => ({
+                this.setState(prev => ({
                     price: json.USD,
-                    lastPrice: prevState.price !== json.USD
-                        ? prevState.price
-                        : prevState.price
+                    lastPrice: prev.price !== json.USD ? prev.price : prev.lastPrice
                 }))
+
             })
-
-
-    }
-
-    priceChange = (lastPrice, price) => {
-        const diff = lastPrice - price;
-        const change = diff / lastPrice
-        return (change * 100).toFixed(3);
     }
 
     render() {
+
         const { name, symbol, price, lastPrice } = this.state;
         const gainLoss = lastPrice > price ? 'loss' : 'gain';
-        
+
         return (
             <div className={`card ${gainLoss}`}>
-                <div className="name">
-                    {name}
-                    <span>({symbol})</span>
+                <div>
+                    {name} 
+                    <span>
+                        ({symbol})
+                    </span>
                 </div>
 
-                <div className="percent">
-                    {this.state.lastPrice ? <>
-                        {this.priceChange(lastPrice, price)}%
-                    </> : <>No Data</>}
+                <div className='percent'>
+
                 </div>
 
                 <div className="logo">
@@ -63,11 +56,13 @@ class CryptoCard extends React.Component {
                 </div>
 
                 <div className="price">
-                    {price}
+                    {this.state.price}
                 </div>
             </div>
         )
-    }
+    };
+
+
 
 };
 
